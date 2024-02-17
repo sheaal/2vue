@@ -3,7 +3,7 @@ new Vue({
     data: {
         showModal: false,
         groupName: '',
-        inputs: ['', '', ''],
+        input: '',
         columns: [
             {
                 title: 'To Do',
@@ -23,18 +23,32 @@ new Vue({
         openModal() {
             this.showModal = true;
         },
-        addCard() {
-            const newTask = {
-                groupName: this.groupName,
-                inputs: this.inputs.filter(input => input !== '')
-            };
-            this.columns[0].tasks.push(newTask);
-            this.groupName = '';
-            this.inputs = ['', '', ''];
+        closeModal() {
             this.showModal = false;
         },
+        addCard() {
+            if (this.groupName.trim() === '') {
+                alert('Group name is required');
+                return;
+            }
+            this.columns[0].tasks.push({
+                groupName: this.groupName,
+                inputs: this.inputs
+            });
+            this.groupName = '';
+            this.inputs = [];
+            this.closeModal();
+        },
+        addInput() {
+            if (this.input.trim() === '') {
+                alert('Input is required');
+                return;
+            }
+            this.inputs.push(this.input);
+            this.input = '';
+        },
         moveTask(task, fromIndex, toIndex) {
-            this.columns[fromIndex].tasks.splice(this.columns[fromIndex].tasks.indexOf(task), 1);
+            this.columns[fromIndex].tasks = this.columns[fromIndex].tasks.filter(t => t !== task);
             this.columns[toIndex].tasks.push(task);
         }
     }

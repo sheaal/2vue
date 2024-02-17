@@ -9,62 +9,42 @@
 </head>
 <body>
 <div id="app">
-    <button id="addCardButton" @click="openModal">Add to card</button>
+    <button @click="openModal">Add card</button>
     <div v-bind:class="{ 'open': showModal }" class="modal">
         <div class="modal-content">
             <form class="cardForm" @submit.prevent="addCard">
                 <p>
-                    <label for="GroupName">Name of the card:</label>
-                    <input id="GroupName" v-model="groupName" placeholder="Name of the card">
+                    <label for="groupName">Group name:</label>
+                    <input type="text" id="groupName" v-model="groupName">
                 </p>
-                <div v-for="(input, index) in inputs" :key="index">
-                    <p>
-                        <label :for="'Input' + uuid">{{ index + 1 }}:</label>
-                        <input :id="'Input' + uuid" v-model="inputs[index]" placeholder="Write down a note">
-                    </p>
-                </div>
                 <p>
-                    <input type="submit" value="Create a new card">
+                    <label for="input">Input:</label>
+                    <input type="text" id="input" v-model="input">
+                    <button @click="addInput">Add</button>
                 </p>
-                <button @click="showModal = false">Close</button>
+                <p>
+                    <button type="submit">Add card</button>
+                </p>
             </form>
         </div>
     </div>
-
     <div class="columns">
-        <div class="column" :class="{ 'full': column.tasks.length >= 3 }">
-            <h2>To Do</h2>
+        <div class="column" :class="{ 'full': column.tasks.length >= 5 }" v-for="(column, index) in columns" :key="index">
+            <h2>{{ column.title }}</h2>
             <div class="tasks">
-                <div v-for="(task, index) in column.tasks" :key="index" class="task">
+                <div v-for="(task, taskIndex) in column.tasks" :key="taskIndex" class="task">
                     <h3>{{ task.groupName }}</h3>
                     <ul>
-                        <li v-for="(input, index) in task.inputs" :key="index">{{ input }}</li>
+                        <li v-for="(input, inputIndex) in task.inputs" :key="inputIndex">{{ input }}</li>
                     </ul>
-                </div>
-            </div>
-        </div>
-        <div class="column" :class="{ 'full': column.tasks.length >= 5 }">
-            <h2>In Progress</h2>
-            <div class="tasks">
-                <div v-for="(task, index) in column.tasks" :key="index" class="task">
-                    <h3>{{ task.groupName }}</h3>
-                    <ul>
-                        <li v-for="(input, index) in task.inputs" :key="index">{{ input }}</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="column">
-            <h2>Done</h2>
-            <div class="tasks">
-                <div v-for="(task, index) in column.tasks" :key="index" class="task">
-                    <h3>{{ task.groupName }}</h3>
-                    <ul>
-                        <li v-for="(input, index) in task.inputs" :key="index">{{ input }}</li>
-                    </ul>
+                    <button v-if="column.title === 'To Do'" @click="moveTask(task, 0, 1)">Move to progress</button>
+                    <button v-if="column.title === 'In Progress'" @click="moveTask(task, 1, 2)">Move to done</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
+<script defer src="./js/vue.js"></script>
+<script defer src="./js/main.js"></script>
+</body>
+</html>
