@@ -4,22 +4,11 @@ new Vue({
         return {
             showModal: false,
             groupName: '',
-            inputs: [
-                {text: '', checked: false},
-            ],
+            inputs: [{text: '', checked: false}],
             columns: [
-                {
-                    title: 'To Do',
-                    tasks: []
-                },
-                {
-                    title: 'In Progress',
-                    tasks: []
-                },
-                {
-                    title: 'Done',
-                    tasks: []
-                }
+                { title: 'To Do', tasks: [] },
+                { title: 'In Progress', tasks: [] },
+                { title: 'Done', tasks: [] }
             ]
         }
     },
@@ -39,7 +28,7 @@ new Vue({
             let newTask = {
                 groupName: this.groupName,
                 inputs: this.inputs.map(input => ({...input})),
-                completionPercentage: 0 // Добавляем новое свойство для отслеживания процента завершения
+                completionPercentage: 0
             };
 
             this.columns[0].tasks.push(newTask);
@@ -47,44 +36,50 @@ new Vue({
             this.inputs = [{text: '', checked: false}];
 
             this.closeModal();
-
-            this.updateTaskStatus(); // Вызываем функцию для обновления статуса задачи
+            this.updateTaskStatus();
         },
 
         updateTaskStatus() {
-            this.columns.forEach(column => {
-                column.tasks.forEach(task => {
-                    let completedCount = task.inputs.filter(input => input.checked).length;
-                    task.completionPercentage = (completedCount / task.inputs.length) * 100; // Рассчитываем процент завершения задачи
+            // Здесь оставьте только логику обновления статуса задач, без вызова перемещения задачи
+            this.columns.forEach((column) => {
+                if (column.title === 'To Do' || column.title === 'In Progress') {
+                    column.tasks.forEach((task) => {
+                        let completedCount = task.inputs.filter((input) => input.checked).length;
+                        task.completionPercentage = (completedCount / task.inputs.length) * 100;
 
-                    if (task.completionPercentage >= 50 && column !== this.columns[2]) {
-                        this.moveTask(task, column, this.columns[this.columns.indexOf(column) + 1]); // Перемещаем задачу в следующий столбец
-                    }
-                    if (task.completionPercentage === 100 && column !== this.columns[2]) {
-                        this.moveTask(task, column, this.columns[this.columns.indexOf(column) + 2]); // Перемещаем задачу в третий столбец
-                        task.completedAt = new Date().toLocaleString(); // Добавляем дату и время завершения задачи
-                    }
-                });
+                        if (task.completionPercentage > 50 && column.title === 'To Do') {
+                            let fromColumn = this.columns.find((col) => col.title === 'To Do');
+                            let toColumn = this.columns.find((col) => col.title === 'In Progress');
+                            this.moveTask(task, fromColumn, toColumn);
+                        }
+                        // else if (completionPercentage === 100){
+                        //     if (column === 'To Do') {
+                        //     }
+
+                    });
+                }
             });
         },
-
+        // Добавьте метод для перемещения задач
         moveTask(task, fromColumn, toColumn) {
-            fromColumn.tasks.splice(fromColumn.tasks.indexOf(task), 1);
-            toColumn.tasks.push(task);
+            // Удаляем задачу из исходного столбца
+            let taskIndex = fromColumn.tasks.indexOf(task);
+            if (taskIndex > -1) {
+                fromColumn.tasks.splice(taskIndex, 1);
+
+                // Добавляем задачу в целевой столбец
+                toColumn.tasks.push(task);
+            }
+        },
+        removeCard(task, column) {
+            // Удаляем задачу из столбца
+            column.tasks.splice(column.tasks.indexOf(task), 1);
         },
         addInput() {
-            if (this.inputs.length < 5) {
-                this.inputs.push({text: '', checked: false});
-            } else {
-                alert('You can add up to 5 items.');
-            }
+            this.inputs.push({text: '', checked: false});
         },
         removeInput(index) {
             this.inputs.splice(index, 1);
         },
-        moveTask(task, fromIndex, toIndex) {
-            this.columns[fromIndex].tasks = this.columns[fromIndex].tasks.filter(t => t !== task);
-            this.columns[toIndex].tasks.push(task);
-        }
     }
 })

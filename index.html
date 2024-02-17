@@ -41,7 +41,7 @@
                 <h3>{{ task.groupName }}</h3>
                 <div v-for="(input, inputIndex) in task.inputs" :key="inputIndex">
                     <label :for="'checkbox' + inputIndex"></label>
-                    <input type="checkbox" :id="'checkbox' + inputIndex" v-model="input.checked">
+                    <input type="checkbox" :id="'checkbox' + inputIndex" v-model="input.checked" @change="updateTaskStatus()">
                     {{ input.text }}
                 </div>
             </div>
