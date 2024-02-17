@@ -57,6 +57,11 @@ new Vue({
                             let toColumn = this.columns.find(col => col.title === 'Done');
                             this.moveTask(task, fromColumn, toColumn);
                         }
+                        else if (task.completionPercentage < 50 && column.title === 'In Progress') {
+                            let fromColumn = this.columns.find(col => col.title === 'In Progress');
+                            let toColumn = this.columns.find(col => col.title === 'To Do');
+                            this.moveTask(task, fromColumn, toColumn);
+                        }
                     });
                 }
             });
