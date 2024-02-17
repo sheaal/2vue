@@ -9,7 +9,43 @@
 </head>
 <body>
 <div id="app">
+    <button id="addCardButton" @click="openModal">Add to card</button>
+    <div v-bind:class="{ 'open': showModal }" class="modal">
+        <div class="modal-content">
+            <form class="cardForm" @submit.prevent="addCard">
+                <p>
+                    <label for="GroupName">Name of the card:</label>
+                    <input id="GroupName" v-model="groupName" placeholder="Name of the card">
+                </p>
+                <p>
+                    <label for="InputOne">1:</label>
+                    <input id="InputOne" v-model="inputOne" placeholder="Write down a note ">
+                </p>
+                <p>
+                    <label for="InputTwo">2:</label>
+                    <input id="InputTwo" v-model="inputTwo" placeholder="Write down a note  ">
+                </p>
+                <p>
+                    <label for="InputThr">3:</label>
+                    <input id="InputThr" v-model="inputThr" placeholder="Write down a note ">
+                </p>
+                <p>
+                    <label for="InputFor">4:</label>
+                    <input id="InputFor" v-model="inputFor" placeholder="Write down a note ">
+                </p>
+                <p>
+                    <label for="InputFiv">5:</label>
+                    <input id="InputFiv" v-model="inputFiv" placeholder="Write down a note ">
+                </p>
+                <p>
+                    <input type="submit" value="Create a new card">
+                </p>
+                <button @click="showModal = false">Close</button>
+            </form>
+        </div>
+    </div>
 
+    </div>
 </div>
 </div>
 <script src="js/vue.js"></script>
