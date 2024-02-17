@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"></script>
     <title>Заметки</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -17,26 +17,12 @@
                     <label for="GroupName">Name of the card:</label>
                     <input id="GroupName" v-model="groupName" placeholder="Name of the card">
                 </p>
-                <p>
-                    <label for="InputOne">1:</label>
-                    <input id="InputOne" v-model="inputOne" placeholder="Write down a note ">
-                </p>
-                <p>
-                    <label for="InputTwo">2:</label>
-                    <input id="InputTwo" v-model="inputTwo" placeholder="Write down a note  ">
-                </p>
-                <p>
-                    <label for="InputThr">3:</label>
-                    <input id="InputThr" v-model="inputThr" placeholder="Write down a note ">
-                </p>
-                <p>
-                    <label for="InputFor">4:</label>
-                    <input id="InputFor" v-model="inputFor" placeholder="Write down a note ">
-                </p>
-                <p>
-                    <label for="InputFiv">5:</label>
-                    <input id="InputFiv" v-model="inputFiv" placeholder="Write down a note ">
-                </p>
+                <div v-for="(input, index) in inputs" :key="index">
+                    <p>
+                        <label :for="'Input' + uuid">{{ index + 1 }}:</label>
+                        <input :id="'Input' + uuid" v-model="inputs[index]" placeholder="Write down a note">
+                    </p>
+                </div>
                 <p>
                     <input type="submit" value="Create a new card">
                 </p>
@@ -45,10 +31,40 @@
         </div>
     </div>
 
+    <div class="columns">
+        <div class="column" :class="{ 'full': column.tasks.length >= 3 }">
+            <h2>To Do</h2>
+            <div class="tasks">
+                <div v-for="(task, index) in column.tasks" :key="index" class="task">
+                    <h3>{{ task.groupName }}</h3>
+                    <ul>
+                        <li v-for="(input, index) in task.inputs" :key="index">{{ input }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="column" :class="{ 'full': column.tasks.length >= 5 }">
+            <h2>In Progress</h2>
+            <div class="tasks">
+                <div v-for="(task, index) in column.tasks" :key="index" class="task">
+                    <h3>{{ task.groupName }}</h3>
+                    <ul>
+                        <li v-for="(input, index) in task.inputs" :key="index">{{ input }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <h2>Done</h2>
+            <div class="tasks">
+                <div v-for="(task, index) in column.tasks" :key="index" class="task">
+                    <h3>{{ task.groupName }}</h3>
+                    <ul>
+                        <li v-for="(input, index) in task.inputs" :key="index">{{ input }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-</div>
-<script src="js/vue.js"></script>
-<script src="js/main.js"></script>
-</body>
-</html>
+<script>
