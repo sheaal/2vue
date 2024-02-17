@@ -35,19 +35,43 @@ new Vue({
                 alert('Group name is required');
                 return;
             }
-            this.columns[0].tasks.push({
+
+            let newTask = {
                 groupName: this.groupName,
-                inputs: this.inputs
-            });
+                inputs: this.inputs.map(input => ({...input})),
+                completionPercentage: 0 // Добавляем новое свойство для отслеживания процента завершения
+            };
+
+            this.columns[0].tasks.push(newTask);
             this.groupName = '';
-            this.inputs = [
-                {text: '', checked: false},
-            ];
+            this.inputs = [{text: '', checked: false}];
+
             this.closeModal();
+
+            this.updateTaskStatus(); // Вызываем функцию для обновления статуса задачи
         },
-        // addInput() {
-        //     this.inputs.push({text: '', checked: false});
-        // },
+
+        updateTaskStatus() {
+            this.columns.forEach(column => {
+                column.tasks.forEach(task => {
+                    let completedCount = task.inputs.filter(input => input.checked).length;
+                    task.completionPercentage = (completedCount / task.inputs.length) * 100; // Рассчитываем процент завершения задачи
+
+                    if (task.completionPercentage >= 50 && column !== this.columns[2]) {
+                        this.moveTask(task, column, this.columns[this.columns.indexOf(column) + 1]); // Перемещаем задачу в следующий столбец
+                    }
+                    if (task.completionPercentage === 100 && column !== this.columns[2]) {
+                        this.moveTask(task, column, this.columns[this.columns.indexOf(column) + 2]); // Перемещаем задачу в третий столбец
+                        task.completedAt = new Date().toLocaleString(); // Добавляем дату и время завершения задачи
+                    }
+                });
+            });
+        },
+
+        moveTask(task, fromColumn, toColumn) {
+            fromColumn.tasks.splice(fromColumn.tasks.indexOf(task), 1);
+            toColumn.tasks.push(task);
+        },
         addInput() {
             if (this.inputs.length < 5) {
                 this.inputs.push({text: '', checked: false});

@@ -21,6 +21,7 @@
                     <p>
                         <label :for="'input' + index">Input:</label>
                         <input type="text" :id="'input' + index" v-model="input.text">
+                        <input type="checkbox" :id="'checkbox' + index" v-model="input.checked">
                         <button type="button" @click.prevent="removeInput(index)" v-if="inputs.length > 1">Remove</button>
                     </p>
                 </div>
@@ -36,14 +37,12 @@
     <div class="columns">
         <div class="column" :class="{ 'full': column.tasks.length >= 5 }" v-for="(column, index) in columns" :key="index">
             <h2>{{ column.title }}</h2>
-            <div class="tasks">
-                <div v-for="(task, taskIndex) in column.tasks" :key="taskIndex" class="task">
-                    <h3>{{ task.groupName }}</h3>
-                    <ul>
-                        <li v-for="(input, inputIndex) in task.inputs" :key="inputIndex">{{ input.text }}</li>
-                    </ul>
-                    <button v-if="column.title === 'To Do'" @click="moveTask(task, 0, 1)">Move to progress</button>
-                    <button v-if="column.title === 'In Progress'" @click="moveTask(task, 1, 2)">Move to done</button>
+            <div v-for="(task, taskIndex) in column.tasks" :key="taskIndex">
+                <h3>{{ task.groupName }}</h3>
+                <div v-for="(input, inputIndex) in task.inputs" :key="inputIndex">
+                    <label :for="'checkbox' + inputIndex"></label>
+                    <input type="checkbox" :id="'checkbox' + inputIndex" v-model="input.checked">
+                    {{ input.text }}
                 </div>
             </div>
         </div>
