@@ -1,23 +1,27 @@
 new Vue({
     el: '#app',
-    data: {
-        showModal: false,
-        groupName: '',
-        input: '',
-        columns: [
-            {
-                title: 'To Do',
-                tasks: []
-            },
-            {
-                title: 'In Progress',
-                tasks: []
-            },
-            {
-                title: 'Done',
-                tasks: []
-            }
-        ]
+    data() {
+        return {
+            showModal: false,
+            groupName: '',
+            inputs: [
+                {text: '', checked: false},
+            ],
+            columns: [
+                {
+                    title: 'To Do',
+                    tasks: []
+                },
+                {
+                    title: 'In Progress',
+                    tasks: []
+                },
+                {
+                    title: 'Done',
+                    tasks: []
+                }
+            ]
+        }
     },
     methods: {
         openModal() {
@@ -36,20 +40,20 @@ new Vue({
                 inputs: this.inputs
             });
             this.groupName = '';
-            this.inputs = [];
+            this.inputs = [
+                {text: '', checked: false},
+            ];
             this.closeModal();
         },
         addInput() {
-            if (this.input.trim() === '') {
-                alert('Input is required');
-                return;
-            }
-            this.inputs.push(this.input);
-            this.input = '';
+            this.inputs.push({text: '', checked: false});
+        },
+        removeInput(index) {
+            this.inputs.splice(index, 1);
         },
         moveTask(task, fromIndex, toIndex) {
             this.columns[fromIndex].tasks = this.columns[fromIndex].tasks.filter(t => t !== task);
             this.columns[toIndex].tasks.push(task);
         }
     }
-});
+})

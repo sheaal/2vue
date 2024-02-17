@@ -17,10 +17,15 @@
                     <label for="groupName">Group name:</label>
                     <input type="text" id="groupName" v-model="groupName">
                 </p>
+                <div v-for="(input, index) in inputs" :key="index">
+                    <p>
+                        <label :for="'input' + index">Input:</label>
+                        <input type="text" :id="'input' + index" v-model="input.text">
+                        <button type="button" @click.prevent="removeInput(index)" v-if="inputs.length > 1">Remove</button>
+                    </p>
+                </div>
                 <p>
-                    <label for="input">Input:</label>
-                    <input type="text" id="input" v-model="input">
-                    <button @click="addInput">Add</button>
+                    <button type="button" @click.prevent="addInput">Add</button>
                 </p>
                 <p>
                     <button type="submit">Add card</button>
@@ -35,7 +40,7 @@
                 <div v-for="(task, taskIndex) in column.tasks" :key="taskIndex" class="task">
                     <h3>{{ task.groupName }}</h3>
                     <ul>
-                        <li v-for="(input, inputIndex) in task.inputs" :key="inputIndex">{{ input }}</li>
+                        <li v-for="(input, inputIndex) in task.inputs" :key="inputIndex">{{ input.text }}</li>
                     </ul>
                     <button v-if="column.title === 'To Do'" @click="moveTask(task, 0, 1)">Move to progress</button>
                     <button v-if="column.title === 'In Progress'" @click="moveTask(task, 1, 2)">Move to done</button>
@@ -47,4 +52,3 @@
 <script defer src="./js/vue.js"></script>
 <script defer src="./js/main.js"></script>
 </body>
-</html>
