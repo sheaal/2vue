@@ -45,8 +45,15 @@ new Vue({
             ];
             this.closeModal();
         },
+        // addInput() {
+        //     this.inputs.push({text: '', checked: false});
+        // },
         addInput() {
-            this.inputs.push({text: '', checked: false});
+            if (this.inputs.length < 5) {
+                this.inputs.push({text: '', checked: false});
+            } else {
+                alert('You can add up to 5 items.');
+            }
         },
         removeInput(index) {
             this.inputs.splice(index, 1);
