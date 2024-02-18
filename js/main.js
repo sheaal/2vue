@@ -31,16 +31,20 @@ new Vue({
                 completionPercentage: 0
             };
 
-            this.columns[0].tasks.push(newTask);
-            this.groupName = '';
-            this.inputs = [{text: '', checked: false}];
+            if (this.columns[0].tasks.length < 3) {
+                this.columns[0].tasks.push(newTask);
 
-            this.closeModal();
-            this.updateTaskStatus();
+                this.groupName = '';
+                this.inputs = [{ text: '', checked: false }];
+
+                this.closeModal();
+                this.updateTaskStatus();
+            } else {
+                alert('You can add up to 3 tasks in "To Do" column.');
+            }
         },
 
         updateTaskStatus() {
-            // Здесь оставьте только логику обновления статуса задач, без вызова перемещения задачи
             this.columns.forEach((column) => {
                 if (column.title === 'To Do' || column.title === 'In Progress') {
                     column.tasks.forEach((task) => {
@@ -66,10 +70,14 @@ new Vue({
                 }
             });
         },
-        // Добавьте метод для перемещения задач
         moveTask(task, fromColumn, toColumn) {
+            if (toColumn.title === 'In Progress' && toColumn.tasks.length >= 5) {
+                alert('You can have up to 5 tasks in "In Progress" column.');
+                return;
+            }
+
             // Удаляем задачу из исходного столбца
-            let taskIndex = fromColumn.tasks.indexOf(task);
+            const taskIndex = fromColumn.tasks.findIndex(t => t === task);
             if (taskIndex > -1) {
                 fromColumn.tasks.splice(taskIndex, 1);
 
@@ -79,7 +87,10 @@ new Vue({
         },
         removeCard(task, column) {
             // Удаляем задачу из столбца
-            column.tasks.splice(column.tasks.indexOf(task), 1);
+            const taskIndex = column.tasks.findIndex(t => t === task);
+            if (taskIndex > -1) {
+                column.tasks.splice(taskIndex, 1);
+            }
         },
         addInput() {
             if (this.inputs.length < 5) {
@@ -87,7 +98,6 @@ new Vue({
             } else {
                 alert('You can add up to 5 items.');
             }
-
         },
         removeInput(index) {
             this.inputs.splice(index, 1);
