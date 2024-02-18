@@ -25,9 +25,8 @@
                         <button type="button" @click.prevent="removeInput(index)" v-if="inputs.length > 1">Remove</button>
                     </p>
                 </div>
-                <p>
                     <button type="button" @click.prevent="addInput">Add</button>
-                </p>
+                    <button v-if="showModal" @click="closeModal">Cancel</button>
                 <p>
                     <button type="submit">Add card</button>
                 </p>

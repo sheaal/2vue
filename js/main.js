@@ -24,13 +24,15 @@ new Vue({
                 alert('Group name is required');
                 return;
             }
-
             let newTask = {
                 groupName: this.groupName,
                 inputs: this.inputs.map(input => ({...input})),
                 completionPercentage: 0
             };
-
+            if (this.inputs.length < 3 || this.inputs.length > 5) {
+                alert('The number of lists should be in the range from 3 to 5');
+                return;
+            }
             if (this.columns[0].tasks.length < 3) {
                 this.columns[0].tasks.push(newTask);
 
@@ -43,7 +45,6 @@ new Vue({
                 alert('You can add up to 3 tasks in "To Do" column.');
             }
         },
-
         updateTaskStatus() {
             this.columns.forEach((column) => {
                 if (column.title === 'To Do' || column.title === 'In Progress') {
@@ -75,18 +76,14 @@ new Vue({
                 alert('You can have up to 5 tasks in "In Progress" column.');
                 return;
             }
-
-            // Удаляем задачу из исходного столбца
             const taskIndex = fromColumn.tasks.findIndex(t => t === task);
             if (taskIndex > -1) {
                 fromColumn.tasks.splice(taskIndex, 1);
 
-                // Добавляем задачу в целевой столбец
                 toColumn.tasks.push(task);
             }
         },
         removeCard(task, column) {
-            // Удаляем задачу из столбца
             const taskIndex = column.tasks.findIndex(t => t === task);
             if (taskIndex > -1) {
                 column.tasks.splice(taskIndex, 1);
@@ -100,7 +97,11 @@ new Vue({
             }
         },
         removeInput(index) {
-            this.inputs.splice(index, 1);
+            if (this.inputs.length > 3) {
+                this.inputs.splice(index, 1);
+            } else {
+                alert('You need at least 3 inputs.');
+            }
         },
     }
 })
