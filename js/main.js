@@ -56,21 +56,30 @@ new Vue({
                             let fromColumn = this.columns.find((col) => col.title === 'To Do');
                             let toColumn = this.columns.find((col) => col.title === 'In Progress');
                             this.moveTask(task, fromColumn, toColumn);
-                        }
-                        else if (task.completionPercentage === 100 && column === this.columns[1]) {
-                            let fromColumn = this.columns.find(col => col.title === 'In Progress');
-                            let toColumn = this.columns.find(col => col.title === 'Done');
+                        } else if (task.completionPercentage === 100 && column === this.columns[1]) {
+                            let fromColumn = this.columns.find((col) => col.title === 'In Progress');
+                            let toColumn = this.columns.find((col) => col.title === 'Done');
+                            this.moveTask(task, fromColumn, toColumn);
+                        } else if (task.completionPercentage < 50 && column.title === 'In Progress') {
+                            let fromColumn = this.columns.find((col) => col.title === 'In Progress');
+                            let toColumn = this.columns.find((col) => col.title === 'To Do');
                             this.moveTask(task, fromColumn, toColumn);
                         }
-                        else if (task.completionPercentage < 50 && column.title === 'In Progress') {
-                            let fromColumn = this.columns.find(col => col.title === 'In Progress');
-                            let toColumn = this.columns.find(col => col.title === 'To Do');
-                            this.moveTask(task, fromColumn, toColumn);
+                        if (column.title === 'In Progress') {
+                            const now = new Date();
+                            if (task.inputs.every(input => input.checked)) {
+                                task.completionDate = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+                            } else {
+                                task.completionDate = null;
+                            }
+                        } else {
+                            task.completionDate = null;
                         }
                     });
                 }
             });
         },
+
         moveTask(task, fromColumn, toColumn) {
             if (toColumn.title === 'In Progress' && toColumn.tasks.length >= 5) {
                 alert('You can have up to 5 tasks in "In Progress" column.');
