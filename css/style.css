@@ -31,11 +31,19 @@
 .column {
     width: 30%;
     padding: 20px;
-    border: 1px solid #ccc;
+    border: 2px solid #20973a;
     border-radius: 5px;
     margin: 10px;
 }
-
+button {
+    border: 1px solid #74d188;
+    border-radius: 9px;
+    background-color: #bde1ca;
+}
+.cancel{
+    background-color: #f48392;
+    border: none;
+}
 .full {
     height: 500px;
     overflow-y: auto;
