@@ -25,7 +25,7 @@
                         <button type="button" @click.prevent="removeInput(index)" v-if="inputs.length > 1">Remove</button>
                     </p>
                 </div>
-                <button type="button" @click.prevent="addInput">Add</button>
+                <button type="button" @click.prevent="addInput">Add input</button>
                 <button class="=cancel" v-if="showModal" @click="closeModal">Cancel</button>
                 <p>
                     <button type="submit">Add card</button>
@@ -38,10 +38,19 @@
             <h2>{{ column.title }}</h2>
             <div v-for="(task, taskIndex) in column.tasks" :key="taskIndex">
                 <h3>{{ task.groupName }}</h3>
-                <div v-for="(input, inputIndex) in task.inputs" :key="inputIndex">
-                    <label :for="'checkbox' + inputIndex"></label>
-                    <input type="checkbox" :id="'checkbox' + inputIndex" v-model="input.checked" @change="updateTaskStatus()">
-                    {{ input.text }}
+                <div v-if="column.title !== 'Done'">
+                    <div v-for="(input, inputIndex) in task.inputs" :key="inputIndex">
+                        <label :for="'checkbox' + inputIndex"></label>
+                        <input type="checkbox" :id="'checkbox' + inputIndex" v-model="input.checked" @change="updateTaskStatus()">
+                        {{ input.text }}
+                    </div>
+                </div>
+                <div v-else>
+                    <div v-for="(input, inputIndex) in task.inputs" :key="inputIndex">
+                        <li>
+                            {{ input.text }}
+                        </li>
+                    </div>
                 </div>
                 <p v-if="task.completionDate">Completion Date: {{ task.completionDate }}</p> <!-- Отображение даты и времени в конце карточки -->
             </div>
