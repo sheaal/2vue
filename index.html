@@ -4,59 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.12/vue.min.js"></script>
-    <title>Заметки</title>
     <link rel="stylesheet" href="css/style.css">
+    <title>Заметки</title>
 </head>
 <body>
-<div id="app">
-    <button @click="openModal">Add card</button>
-    <div v-bind:class="{ 'open': showModal }" class="modal">
-        <div class="modal-content">
-            <form class="cardForm" @submit.prevent="addCard">
-                <p>
-                    <label for="groupName">Group name:</label>
-                    <input type="text" id="groupName" v-model="groupName">
-                </p>
-                <div v-for="(input, index) in inputs" :key="index">
-                    <p>
-                        <label :for="'input' + index">Input:</label>
-                        <input type="text" :id="'input' + index" v-model="input.text">
-                        <input type="checkbox" :id="'checkbox' + index" v-model="input.checked">
-                        <button type="button" @click.prevent="removeInput(index)" v-if="inputs.length > 1">Remove</button>
-                    </p>
-                </div>
-                <button type="button" @click.prevent="addInput">Add input</button>
-                <button class="=cancel" v-if="showModal" @click="closeModal">Cancel</button>
-                <p>
-                    <button type="submit">Add card</button>
-                </p>
-            </form>
+<div id="app" :class="{ 'app_card': true, 'disabled': column1Locked }">
+    <form class="form" @submit.prevent="addCard">
+        <input class="title_form" type="text" v-model="newCardTitle" placeholder="Group name:" :disabled="column2Full1">
+        <input class="text_form" v-for="(item, index) in newCardItems" type="text" v-model="item.text" :placeholder="'Input ' + (index + 1)" :disabled="column2Full1">
+        <button class="baton" type="submit" :disabled="column2Full1">Add Task</button>
+    </form>
+    <div class="column" :disabled="column2Full1">
+        <h2>To Do</h2>
+        <div v-for="(card, index) in plannedTasks" :key="index" class="card" :class="{'disabled': column2Full1}">
+            <h3>{{ card.title }}</h3>
+            <ul>
+                <li v-for="(item, i) in card.items" :key="i">
+                    <input type="checkbox" v-model="item.checked" :disabled="column1Locked" @change="checkItem(card)">
+                    <input type="text" v-model="item.text" :disabled="column1Locked" @change="updateItemText(card, item, $event.target.value)">
+                </li>
+            </ul>
         </div>
     </div>
-    <div class="columns">
-        <div class="column" :class="{ 'full': column.tasks.length >= 5 }" v-for="(column, index) in columns" :key="index">
-            <h2>{{ column.title }}</h2>
-            <div v-for="(task, taskIndex) in column.tasks" :key="taskIndex">
-                <h3>{{ task.groupName }}</h3>
-                <div v-if="column.title !== 'Done'">
-                    <div v-for="(input, inputIndex) in task.inputs" :key="inputIndex">
-                        <label :for="'checkbox' + inputIndex"></label>
-                        <input type="checkbox" :id="'checkbox' + inputIndex" v-model="input.checked" @change="updateTaskStatus()">
-                        {{ input.text }}
-                    </div>
-                </div>
-                <div v-else>
-                    <div v-for="(input, inputIndex) in task.inputs" :key="inputIndex">
-                        <li>
-                            {{ input.text }}
-                        </li>
-                    </div>
-                </div>
-                <p v-if="task.completionDate">Completion Date: {{ task.completionDate }}</p> <!-- Отображение даты и времени в конце карточки -->
-            </div>
+    <div class="column" :class="{'disabled': column2Locked}">
+        <h2>In Progress</h2>
+        <div v-for="(card, index) in progressTasks" :key="index" class="card">
+            <h3>{{ card.title }}</h3>
+            <ul>
+                <li v-for="(item, i) in card.items" :key="i">
+                    <input type="checkbox" v-model="item.checked" :disabled="column1Locked" @change="checkItem(card)">
+                    <label>{{ item.text }}</label>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="column1">
+        <h2>Done</h2>
+        <div v-for="(card, index) in completedTasks" :key="index" class="card">
+            <h3>{{ card.title }}</h3>
+            <ul>
+                <li v-for="(item, i) in card.items" :key="i">
+                    {{ item.text }}
+                </li>
+            </ul>
+            <p v-if="card.completed" class="lastCheckbox">Date and time of the last execution: {{ card.lastCompleted }}</p>
+            <span class="last-checked">{{ card.lastChecked }}</span>
         </div>
     </div>
 </div>
-<script defer src="./js/vue.js"></script>
-<script defer src="./js/main.js"></script>
+<script defer src="js/vue.js"></script>
+<script defer src="js/main.js"></script>
 </body>
+</html>

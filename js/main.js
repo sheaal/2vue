@@ -1,187 +1,184 @@
+const storageKey = 'new';
+const storageData = localStorage.getItem(storageKey);
+const initialData = storageData ? JSON.parse(storageData) : {
+    plannedTasks: [],
+    progressTasks: [],
+    completedTasks: []
+};
+
 new Vue({
     el: '#app',
-    data() {
-        return {
-            showModal: false,
-            groupName: '',
-            inputs: [{text: '', checked: false}],
-            columns: [
-                { title: 'To Do', tasks: [] },
-                { title: 'In Progress', tasks: [] },
-                { title: 'Done', tasks: [] }
-            ]
-        }
+    data: {
+        plannedTasks: initialData.plannedTasks,
+        progressTasks: initialData.progressTasks,
+        completedTasks: initialData.completedTasks,
+        newCardTitle: '',
+        newCardItems: [{ text: '' }, { text: '' }, { text: '' }, { text: '' }, { text: '' }],
+        column1Locked: false,
+        column2Full1: false,
+        column2Locked: false,
     },
     methods: {
-        openModal() {
-            this.showModal = true;
-        },
-        closeModal() {
-            this.showModal = false;
-        },
         addCard() {
-            if (this.groupName.trim() === '') {
-                alert('Group name is required');
+            if (!this.newCardTitle) {
+                alert('You must specify the name of the task');
                 return;
             }
-            let newTask = {
-                groupName: this.groupName,
-                inputs: this.inputs.map(input => ({...input})),
-                completionPercentage: 0
-            };
-            let allInputsFilled = this.inputs.every(input => input.text.trim() !== '');
-            if (!allInputsFilled) {
-                alert('You need to fill all inputs before adding a card.');
-                return;
-            }
-            if (this.inputs.length < 3 || this.inputs.length > 5) {
-                alert('The number of lists should be in the range from 3 to 5');
-                return;
-            }
-            if (this.columns[0].tasks.length < 3) {
-                this.columns[0].tasks.push({
-                    groupName: this.groupName,
-                    inputs: this.inputs.map(input => ({...input})),
-                    completionPercentage: 0
-                });
+            if (this.newCardTitle.trim() !== '') {
+                if (this.column2Full1) {
+                    alert("You cannot add more than 5 cards to the second list");
+                    return;
+                }
 
-                this.groupName = '';
-                this.inputs = [{ text: '', checked: false }];
+                const filledItems = this.newCardItems.filter(item => item.text.trim() !== '');
+                if (filledItems.length < 3) {
+                    alert("The number of lists should be in the range from 3 to 5");
+                    return;
+                }
 
-                this.closeModal();
-                this.updateTaskStatus();
-            } else {
-                alert('You can add up to 3 tasks in "To Do" column.');
-            }
-
-            localStorage.setItem('taskManagerData', JSON.stringify(this.$data));
-        },
-        // updateTaskStatus() {
-        //     this.columns.forEach((column) => {
-        //         if (column.title === 'To Do' || column.title === 'In Progress') {
-        //             column.tasks.forEach((task) => {
-        //                 let completedCount = task.inputs.filter((input) => input.checked).length;
-        //                 task.completionPercentage = (completedCount / task.inputs.length) * 100;
-
-        //                 if (task.completionPercentage > 50 && column.title === 'To Do') {
-        //                     let fromColumn = this.columns.find((col) => col.title === 'To Do');
-        //                     let toColumn = this.columns.find((col) => col.title === 'In Progress');
-        //                     this.moveTask(task, fromColumn, toColumn);
-        //                 } else if (task.completionPercentage === 100 && column.title === 'In Progress') {
-        //                     let fromColumn = this.columns.find((col) => col.title === 'In Progress');
-        //                     let toColumn = this.columns.find((col) => col.title === 'Done');
-        //                     this.moveTask(task, fromColumn, toColumn);
-        //                 } else if (task.completionPercentage < 50 && column.title === 'In Progress') {
-        //                     let fromColumn = this.columns.find((col) => col.title === 'In Progress');
-        //                     let toColumn = this.columns.find((col) => col.title === 'To Do');
-        //                     this.moveTask(task, fromColumn, toColumn);
-        //                 }
-        //                 if (column.title === 'In Progress') {
-        //                     const now = new Date();
-        //                     if (task.inputs.every(input => input.checked)) {
-        //                         task.completionDate = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-        //                     } else {
-        //                         task.completionDate = null;
-        //                     }
-        //                 } else {
-        //                     task.completionDate = null;
-        //                 }
-        //             });
-        //         }
-        //     });
-
-        //     localStorage.setItem('taskManagerData', JSON.stringify(this.$data));
-        // },
-
-        updateTaskStatus() {
-            this.columns.forEach((column) => {
-                if (column.title === 'To Do' || column.title === 'In Progress') {
-                    column.tasks.forEach((task) => {
-                        let completedCount = task.inputs.filter((input) => input.checked).length;
-                        task.completionPercentage = (completedCount / task.inputs.length) * 100;
-
-                        if (column.title === 'To Do') {
-                            if (task.completionPercentage >= 50 && this.columns[1].tasks.length < 5) {
-                                let fromColumn = this.columns.find((col) => col.title === 'To Do');
-                                let toColumn = this.columns.find((col) => col.title === 'In Progress');
-                                this.moveTask(task, fromColumn, toColumn);
-                            } else if (task.completionPercentage === 100) {
-                                let fromColumn = this.columns.find((col) => col.title === 'To Do');
-                                let toColumn = this.columns.find((col) => col.title === 'Done');
-                                this.moveTask(task, fromColumn, toColumn);
-                            }
-                        } else if (column.title === 'In Progress') {
-                            if (task.completionPercentage < 50 && this.columns[0].tasks.length < 3) {
-                                let fromColumn = this.columns.find((col) => col.title === 'In Progress');
-                                let toColumn = this.columns.find((col) => col.title === 'To Do');
-                                this.moveTask(task, fromColumn, toColumn);
-                            } else if (task.completionPercentage === 100) {
-                                let fromColumn = this.columns.find((col) => col.title === 'In Progress');
-                                let toColumn = this.columns.find((col) => col.title === 'Done');
-                                this.moveTask(task, fromColumn, toColumn);
-                            }
-                        }
-
-                        if (column.title === 'In Progress') {
-                            const now = new Date();
-                            if (task.inputs.every(input => input.checked)) {
-                                task.completionDate = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
-                            } else {
-                                task.completionDate = null;
-                            }
-                        } else {
-                            task.completionDate = null;
-                        }
-
+                if (!this.column1Locked && this.plannedTasks.length < 3) {
+                    this.plannedTasks.push({
+                        title: this.newCardTitle,
+                        items: filledItems
                     });
+                } else {
+                    alert("You cannot add more than 3 cards to 1 column");
+                    return;
                 }
-            });
-
-            localStorage.setItem('taskManagerData', JSON.stringify(this.$data));
+                this.newCardTitle = '';
+                this.newCardItems = [
+                    { text: '' },
+                    { text: '' },
+                    { text: '' },
+                    { text: '' },
+                    { text: '' }
+                ];
+                if (this.progressTasks.length < 5) {
+                    this.column1Locked = false;
+                }
+            }
         },
-
-        moveTask(task, fromColumn, toColumn) {
-            if (toColumn.title === 'In Progress' && toColumn.tasks.length === 5) {
-                alert('You can have up to 5 tasks in "In Progress" column.');
+        checkItem(card) {
+            if (this.column1Locked) {
                 return;
             }
-            const taskIndex = fromColumn.tasks.findIndex(t => t === task);
-            if (taskIndex > -1) {
-                fromColumn.tasks.splice(taskIndex, 1);
+            this.column2Full1 = false;
+            const checkedCount = card.items.filter(item => item.checked).length;
+            const totalCount = card.items.length;
+            const completionPercentage = (checkedCount / totalCount) * 100;
 
-                toColumn.tasks.push(task);
+            if (completionPercentage >= 50 && this.plannedTasks.includes(card)) {
+                if (this.progressTasks.length < 5) {
+                    this.moveCardToSecondColumn(card);
+                } else {
+                    this.column2Full1 = true;
+                    alert("You cannot add more than 5 cards to the second list");
+                    return;
+                }
+            }
+            if (this.column1Locked && this.progressTasks.length === 5 && completionPercentage >= 50) {
+                this.column2Full1 = true;
+            }
+            if (completionPercentage >= 50 && this.plannedTasks.includes(card)) {
+                this.column1Locked = true;
+            }
+            if (completionPercentage < 50 && this.progressTasks.includes(card) && this.plannedTasks.length < 3) {
+                this.column1Locked = false;
+            }
+            if (this.column2Full1 === false && this.progressTasks.length < 5 && this.column2Full1 && this.plannedTasks.includes(card)) {
+                this.moveCardToSecondColumn(card);
+            }
+            if (!this.column2Full1) {
+                this.checkAndMoveCards();
+            }
+            if (completionPercentage >= 50 && this.completedTasks.includes(card)) {
+                if (this.progressTasks.length < 5) {
+                    const index = this.completedTasks.indexOf(card);
+                    this.completedTasks.splice(index, 1);
+                    this.progressTasks.push(card);
+                } else {
+                    alert("");
+                    return;
+                }
+            }
+            if (completionPercentage < 50 && this.progressTasks.includes(card) && this.plannedTasks.length < 3){
+                const index1 = this.progressTasks.indexOf(card);
+                this.progressTasks.splice(index1, 1);
+                this.plannedTasks.push(card);
+            }
+            if (completionPercentage < 100) {
+                card.completed = false;
+            }
+            if (completionPercentage === 100 && !this.completedTasks.includes(card)) {
+                card.completed = true;
+                card.lastCompleted = new Date().toLocaleString();
+                if (this.progressTasks.includes(card)) {
+                    this.progressTasks.splice(this.progressTasks.indexOf(card), 1);
+                }
+                this.completedTasks.push(card);
+            } else if (completionPercentage === 100 && this.completedTasks.includes(card)) {
+                card.lastCompleted = new Date().toLocaleString();
+            } else {
+                card.lastCompleted = "";
+            }
+            if (completionPercentage < 100 && this.completedTasks.includes(card)) {
+                const index = this.completedTasks.indexOf(card);
+                this.completedTasks.splice(index, 1);
+                this.progressTasks.push(card);
+            }
+        },
+        moveCardToSecondColumn(card) {
+            const index = this.plannedTasks.indexOf(card);
+            if (index !== -1) {
+                this.plannedTasks.splice(index, 1);
+                this.progressTasks.push(card);
+            }
+        },
+        checkAndMoveCards() {
+            for (let i = this.plannedTasks.length - 1; i >= 0; i--) {
+                const card = this.plannedTasks[i];
+                const checkedCount = card.items.filter(item => item.checked).length;
+                const totalCount = card.items.length;
+                const completionPercentage = (checkedCount / totalCount) * 100;
 
-                if (fromColumn.title === 'To Do' && toColumn.title === 'In Progress') {
-                    this.updateTaskStatus();
+                if (completionPercentage >= 50) {
+                    this.moveCardToSecondColumn(card);
                 }
             }
         },
-        // removeCard(task, column) {
-        //     const taskIndex = column.tasks.findIndex(t => t === task);
-        //     if (taskIndex > -1) {
-        //         column.tasks.splice(taskIndex, 1);
-        //     }
-        // },
-        addInput() {
-            if (this.inputs.length < 5) {
-                this.inputs.push({text: '', checked: false});
-            } else {
-                alert('You can add up to 5 items.');
+        updateItemText(card, item, newText) {
+            if (this.column1Locked) {
+                return;
             }
+            item.text = newText;
         },
-        removeInput(index) {
-            if (this.inputs.length > 3) {
-                this.inputs.splice(index, 1);
-            } else {
-                alert('You need at least 3 inputs.');
-            }
-        },
+        saveData() {
+            const data = {
+                plannedTasks: this.plannedTasks,
+                progressTasks: this.progressTasks,
+                completedTasks: this.completedTasks
+            };
+            localStorage.setItem(storageKey, JSON.stringify(data));
+        }
     },
-    mounted() {
-        // Load data from localStorage
-        const savedData = localStorage.getItem('taskManagerData');
-        if (savedData) {
-            Object.assign(this.$data, JSON.parse(savedData));
+    watch: {
+        plannedTasks: {
+            handler(newPlannedTasks) {
+                this.saveData();
+            },
+            deep: true
+        },
+        progressTasks: {
+            handler(newProgressTasks) {
+                this.saveData();
+            },
+            deep: true
+        },
+        completedTasks: {
+            handler(newCompletedTasks) {
+                this.saveData();
+            },
+            deep: true
         }
     }
-})
+});
