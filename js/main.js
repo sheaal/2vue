@@ -16,7 +16,6 @@ new Vue({
         newCardItems: [{ text: '' }, { text: '' }, { text: '' }, { text: '' }, { text: '' }],
         column1Locked: false,
         column2Full1: false,
-        column2Locked: false,
     },
     methods: {
         addCard() {
